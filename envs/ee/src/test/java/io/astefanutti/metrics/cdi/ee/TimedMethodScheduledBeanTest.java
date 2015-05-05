@@ -18,7 +18,6 @@ package io.astefanutti.metrics.cdi.ee;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import javax.inject.Inject;
-import org.hamcrest.Matchers;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -47,7 +46,7 @@ public class TimedMethodScheduledBeanTest {
                     .resolve("io.astefanutti.metrics.cdi:metrics-cdi")
                     .withTransitivity()
                     .as(JavaArchive.class))
-            .addAsLibrary(ShrinkWrap.create(JavaArchive.class)
+            .addAsModule(ShrinkWrap.create(JavaArchive.class)
                     .addClass(TimedMethodScheduledBean.class)
                     // FIXME: Test class must be added until ARQ-659 is fixed
                     .addClass(TimedMethodScheduledBeanTest.class)

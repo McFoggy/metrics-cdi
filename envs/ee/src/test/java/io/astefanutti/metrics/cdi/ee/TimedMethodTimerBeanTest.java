@@ -34,7 +34,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(Arquillian.class)
 public class TimedMethodTimerBeanTest {
-    private final static String SCHEDULE_TIMER_NAME = MetricRegistry.name(TimedMethodTimerBean.class, "schedule");
+    private final static String TIMER_NAME = MetricRegistry.name(TimedMethodTimerBean.class, "schedule");
 
     @Deployment
     public static Archive<?> createTestArchive() {
@@ -46,7 +46,7 @@ public class TimedMethodTimerBeanTest {
                     .resolve("io.astefanutti.metrics.cdi:metrics-cdi")
                     .withTransitivity()
                     .as(JavaArchive.class))
-            .addAsLibrary(ShrinkWrap.create(JavaArchive.class)
+            .addAsModule(ShrinkWrap.create(JavaArchive.class)
                     .addClass(TimedMethodTimerBean.class)
                     // FIXME: Test class must be added until ARQ-659 is fixed
                     .addClass(TimedMethodTimerBeanTest.class)
@@ -63,8 +63,8 @@ public class TimedMethodTimerBeanTest {
             Thread.sleep(3000l);
         } catch (InterruptedException ex) {}
         
-        assertThat("Schedule timer is not registered correctly", registry.getTimers(), hasKey(SCHEDULE_TIMER_NAME));
-        Timer timer = registry.getTimers().get(SCHEDULE_TIMER_NAME);
+        assertThat("Schedule timer is not registered correctly", registry.getTimers(), hasKey(TIMER_NAME));
+        Timer timer = registry.getTimers().get(TIMER_NAME);
 
         // Make sure that the timer has been called
         assertThat("Schedule timer count is incorrect", timer.getCount(), greaterThan(0l));
