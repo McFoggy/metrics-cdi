@@ -21,6 +21,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.Singleton;
 import javax.ejb.Timeout;
+import javax.ejb.TimerConfig;
 import javax.ejb.TimerService;
 
 @Singleton
@@ -31,7 +32,7 @@ public class TimedMethodTimerBean {
     
     @PostConstruct
     public void init() {
-        ts.createTimer(TimeUnit.SECONDS.toMillis(1), null);
+        ts.createIntervalTimer(0l, TimeUnit.SECONDS.toMillis(1), new TimerConfig("a test timer", false));
     }
     
 
