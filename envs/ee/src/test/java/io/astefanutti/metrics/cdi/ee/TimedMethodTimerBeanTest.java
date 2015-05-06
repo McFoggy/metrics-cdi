@@ -17,6 +17,7 @@ package io.astefanutti.metrics.cdi.ee;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import java.util.SortedMap;
 import javax.inject.Inject;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
@@ -30,12 +31,13 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 
 @RunWith(Arquillian.class)
 public class TimedMethodTimerBeanTest {
     private final static String TIMER_NAME = MetricRegistry.name(TimedMethodTimerBean.class, "schedule");
-
+    
     @Deployment
     public static Archive<?> createTestArchive() {
         return ShrinkWrap.create(EnterpriseArchive.class)
@@ -48,6 +50,7 @@ public class TimedMethodTimerBeanTest {
                     .as(JavaArchive.class))
             .addAsModule(ShrinkWrap.create(JavaArchive.class)
                     .addClass(TimedMethodTimerBean.class)
+                    .addClass(CallCounter.class)
                     // FIXME: Test class must be added until ARQ-659 is fixed
                     .addClass(TimedMethodTimerBeanTest.class)
                     .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml"));
@@ -56,6 +59,14 @@ public class TimedMethodTimerBeanTest {
     @Inject
     private MetricRegistry registry; 
     
+    @Inject 
+    private CallCounter counter;
+    
+    @Before
+    public void init() {
+        counter.reset();
+    }
+    
     @Test
     public void testATimerMethodCanBeTimed() {
         // let's wait a few seconds, so that the scheduled method has been fired
@@ -63,10 +74,15 @@ public class TimedMethodTimerBeanTest {
             Thread.sleep(3000l);
         } catch (InterruptedException ex) {}
         
-        assertThat("Schedule timer is not registered correctly", registry.getTimers(), hasKey(TIMER_NAME));
-        Timer timer = registry.getTimers().get(TIMER_NAME);
+        final SortedMap<String, Timer> allTimers = registry.getTimers();
+        
+        assertThat("Schedule timer is not registered correctly", allTimers, hasKey(TIMER_NAME));
+        Timer timer = allTimers.get(TIMER_NAME);
 
         // Make sure that the timer has been called
+        assertThat("Timer has not been called", counter.value(), greaterThan(0l));
+
+        // Make sure that the interception occured
         assertThat("Schedule timer count is incorrect", timer.getCount(), greaterThan(0l));
     }
 }

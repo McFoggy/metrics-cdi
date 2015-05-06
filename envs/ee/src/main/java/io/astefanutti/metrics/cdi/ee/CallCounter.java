@@ -15,19 +15,22 @@
  */
 package io.astefanutti.metrics.cdi.ee;
 
-import com.codahale.metrics.annotation.Timed;
-import javax.ejb.Schedule;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
+import java.util.concurrent.atomic.AtomicLong;
+import javax.inject.Singleton;
 
-@Stateless
-public class TimedMethodScheduledBean {
-    @Inject
-    private CallCounter counter;
+@Singleton
+public class CallCounter {
+    private final AtomicLong counter = new AtomicLong();
     
-    @Schedule(hour = "*", minute = "*", second = "*", persistent = false)
-    @Timed(name = "schedule")
-    public void scheduledMethod() {
-        counter.count();
+    public void reset() {
+        counter.set(0l);
+    }
+    
+    public void count() {
+        counter.incrementAndGet();
+    }
+    
+    public long value() {
+        return counter.get();
     }
 }

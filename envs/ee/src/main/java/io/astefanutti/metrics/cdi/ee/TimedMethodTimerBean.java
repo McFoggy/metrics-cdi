@@ -19,25 +19,33 @@ import com.codahale.metrics.annotation.Timed;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
+import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.TimerConfig;
 import javax.ejb.TimerService;
+import javax.inject.Inject;
 
 @Singleton
+@Startup
 public class TimedMethodTimerBean {
-
+    
     @Resource
     private TimerService ts;
+    
+    @Inject
+    CallCounter counter;
     
     @PostConstruct
     public void init() {
         ts.createIntervalTimer(0l, TimeUnit.SECONDS.toMillis(1), new TimerConfig("a test timer", false));
     }
     
-
     @Timed(name = "schedule")
     @Timeout
     public void scheduledMethod() {
+        counter.count();
     }
 }

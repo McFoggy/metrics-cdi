@@ -30,6 +30,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 
 @RunWith(Arquillian.class)
@@ -48,6 +49,7 @@ public class TimedMethodScheduledBeanTest {
                     .as(JavaArchive.class))
             .addAsModule(ShrinkWrap.create(JavaArchive.class)
                     .addClass(TimedMethodScheduledBean.class)
+                    .addClass(CallCounter.class)
                     // FIXME: Test class must be added until ARQ-659 is fixed
                     .addClass(TimedMethodScheduledBeanTest.class)
                     .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml"));
@@ -55,6 +57,14 @@ public class TimedMethodScheduledBeanTest {
     
     @Inject
     private MetricRegistry registry; 
+
+    @Inject
+    private CallCounter counter; 
+    
+    @Before
+    public void init() {
+        counter.reset();
+    }
     
     @Test
     public void testAScheduleMethodCanBeTimed() {
@@ -67,6 +77,9 @@ public class TimedMethodScheduledBeanTest {
         Timer timer = registry.getTimers().get(SCHEDULE_TIMER_NAME);
 
         // Make sure that the timer has been called
+        assertThat("Timer has not been called", counter.value(), greaterThan(0l));
+
+        // Make sure that the interception occured
         assertThat("Schedule timer count is incorrect", timer.getCount(), greaterThan(0l));
     }
 }
