@@ -10,7 +10,7 @@
 
     <groupId>io.astefanutti.metrics.cdi</groupId>
     <artifactId>metrics-cdi-parent</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1.0-AM001</version>
     <packaging>pom</packaging>
 
     <name>Metrics CDI</name>
@@ -426,4 +426,16 @@
         </dependencies>
     </dependencyManagement>
 
+    <distributionManagement>
+        <repository>
+            <id>orbis-dev</id>
+            <name>orbis-dev</name>
+            <url>http://orbis-maven.agfahealthcare.com/orbis-dev</url>
+        </repository>
+        <snapshotRepository>
+            <id>orbis-snapshots</id>
+            <name>orbis-snapshots</name>
+            <url>http://orbis-maven.agfahealthcare.com/orbis-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
