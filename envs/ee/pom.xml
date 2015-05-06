@@ -78,8 +78,9 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <excludes>
-                                <exclude>**/TimedMethodScheduledBeanTest.java</exclude>
-                                <exclude>**/TimedMethodTimerBeanTest.java</exclude>
+                                <!-- exclusion of EJB specific tests for weld only profile -->
+                                <exclude>**/*Scheduled*.java</exclude>
+                                <exclude>**/*Timer*.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
